@@ -651,6 +651,14 @@ do_PrefetchAbort(unsigned long addr, unsigned int ifsr, struct pt_regs *regs)
 				sys_rt_sigreturn(regs);
 			return;
 		}
+		if (pc == 0xffff0fa0UL) {
+			/*
+			 * PaX: __kuser_memory_barrier emulation
+			 */
+			// dmb(); //implied by the exeption
+			regs->ARM_pc = regs->ARM_lr;
+			return;
+		}
 		if (pc == 0xffff0fe0UL) {
 			/*
 			 * PaX: __kuser_get_tls emulation
